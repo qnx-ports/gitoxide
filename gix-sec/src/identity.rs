@@ -32,13 +32,13 @@ mod impl_ {
     use std::path::Path;
 
     pub fn is_path_owned_by_current_user(path: &Path) -> std::io::Result<bool> {
-        fn owner_from_path(path: &Path) -> std::io::Result<u32> {
+        fn owner_from_path(path: &Path) -> std::io::Result<libc::uid_t> {
             use std::os::unix::fs::MetadataExt;
             let meta = std::fs::symlink_metadata(path)?;
             Ok(meta.uid())
         }
 
-        fn owner_of_current_process() -> std::io::Result<u32> {
+        fn owner_of_current_process() -> std::io::Result<libc::uid_t> {
             // SAFETY: there is no documented possibility for failure
             #[allow(unsafe_code)]
             let uid = unsafe { libc::geteuid() };
