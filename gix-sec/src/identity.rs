@@ -35,7 +35,7 @@ mod impl_ {
         fn owner_from_path(path: &Path) -> std::io::Result<libc::uid_t> {
             use std::os::unix::fs::MetadataExt;
             let meta = std::fs::symlink_metadata(path)?;
-            Ok(meta.uid())
+            Ok(meta.uid() as libc::uid_t)
         }
 
         fn owner_of_current_process() -> std::io::Result<libc::uid_t> {
@@ -51,7 +51,7 @@ mod impl_ {
         if owner_of_path == owner_of_process {
             Ok(true)
         } else if let Some(sudo_uid) =
-            std::env::var_os("SUDO_UID").and_then(|val| val.to_str().and_then(|val_str| u32::from_str(val_str).ok()))
+            std::env::var_os("SUDO_UID").and_then(|val| val.to_str().and_then(|val_str| libc::uid_t::from_str(val_str).ok()))
         {
             Ok(owner_of_path == sudo_uid)
         } else {
